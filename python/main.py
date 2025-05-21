@@ -1,76 +1,13 @@
 from enum import Enum
 
-from matplotlib import pyplot as plt
-from matplotlib import cm
-import numpy as np
+from copy import deepcopy
 
-from copy import copy, deepcopy
-from itertools import pairwise
+import sys
+sysargs = sys.argv
 
-
-symbol_representations = [
-    np.zeros((5, 5)),
-
-    [np.zeros((5)),
-     np.zeros((5)),
-     [1, 1, 1, 1, 1],
-     np.zeros((5)),
-     np.zeros((5))],
-
-    [[0, 0, 1, 0, 0],
-     [0, 0, 1, 0, 0],
-     [0, 0, 1, 0, 0],
-     [0, 0, 1, 0, 0],
-     [0, 0, 1, 0, 0]],
-    
-    [np.zeros((5)),
-     np.zeros((5)),
-     [0, 0, 1, 1, 1],
-     [0, 0, 1, 0, 0],
-     [0, 0, 1, 0, 0]],
-
-    [np.zeros((5)),
-     np.zeros((5)),
-     [1, 1, 1, 0, 0],
-     [0, 0, 1, 0, 0],
-     [0, 0, 1, 0, 0]],
-
-    [[0, 0, 1, 0, 0],
-     [0, 0, 1, 0, 0],
-     [0, 0, 1, 1, 1],
-     np.zeros((5)),
-     np.zeros((5))],
-
-    [[0, 0, 1, 0, 0],
-     [0, 0, 1, 0, 0],
-     [1, 1, 1, 0, 0],
-     np.zeros((5)),
-     np.zeros((5))],
-
-    [[0, 0, 1, 0, 0],
-     [0, 0, 0, 0, 0],
-     [1, 1, 1, 1, 1],
-     [0, 0, 0, 0, 0],
-     [0, 0, 1, 0, 0]],
-
-    [[0, 0, 1, 0, 0],
-     [0, 0, 1, 0, 0],
-     [1, 0, 1, 0, 1],
-     [0, 0, 1, 0, 0],
-     [0, 0, 1, 0, 0]],
-
-    [[0, 0, 1, 0, 0],
-     [0, 1, 0, 0, 0],
-     [1, 0, 0, 0, 1],
-     [0, 0, 0, 1, 0],
-     [0, 0, 1, 0, 0]],
-
-    [[0, 0, 1, 0, 0],
-     [0, 0, 0, 1, 0],
-     [1, 0, 0, 0, 1],
-     [0, 1, 0, 0, 0],
-     [0, 0, 1, 0, 0]],
-]
+verbose_mode = False
+if len(sysargs) > 1 and sysargs[1] == '-v':
+    verbose_mode = True
 
 symbol_str_representations = [
     ["       ",
@@ -169,54 +106,68 @@ def opposite_dir(dir: Direction) -> Direction:
         case Direction.LEFT: return Direction.RIGHT
         case Direction.UP: return Direction.DOWN
         case Direction.DOWN: return Direction.UP
+        case Direction.NONE: return Direction.NONE
      
 def walk_symbol(symbol: Symbol, dir: Direction) -> Direction:
     if not opening(symbol, opposite_dir(dir)):
         return Direction.NONE
 
-    match symbol:
-        case Symbol.HORIZONTAL: 
-            if dir == Direction.RIGHT:
-                return Direction.RIGHT
-            return Direction.LEFT
-        case Symbol.VERTICAL: 
-            if dir == Direction.UP:
-                return Direction.UP
-            return Direction.DOWN
-        case Symbol.RIGHT_BOT_CORNER: 
-            if dir == Direction.UP:
-                return Direction.RIGHT
-            return Direction.DOWN
-        case Symbol.LEFT_BOT_CORNER: 
-            if dir == Direction.UP:
-                return Direction.LEFT
-            return Direction.DOWN
-        case Symbol.RIGHT_TOP_CORNER: 
-            if dir == Direction.DOWN:
-                return Direction.RIGHT
-            return Direction.UP
-        case Symbol.LEFT_TOP_CORNER: 
-            if dir == Direction.DOWN:
-                return Direction.LEFT
-            return Direction.UP
-        case Symbol.HOR_CROSS: return dir
-        case Symbol.VERT_CROSS: return dir
-        case Symbol.DIAG1: 
-            if dir == Direction.RIGHT:
-                return Direction.UP
-            if dir == Direction.LEFT:
-                return Direction.DOWN
-            if dir == Direction.DOWN:
-                return Direction.LEFT
+    match symbol, dir:
+        case Symbol.HORIZONTAL, Direction.RIGHT:
             return Direction.RIGHT
-        case Symbol.DIAG2: 
-            if dir == Direction.RIGHT:
-                return Direction.DOWN
-            if dir == Direction.LEFT:
-                return Direction.UP
-            if dir == Direction.DOWN:
-                return Direction.RIGHT
+        case Symbol.HORIZONTAL, Direction.LEFT:
             return Direction.LEFT
+        
+        case Symbol.VERTICAL, Direction.UP:
+            return Direction.UP
+        case Symbol.VERTICAL, Direction.DOWN:
+            return Direction.DOWN
+        
+        case Symbol.RIGHT_BOT_CORNER, Direction.UP: 
+            return Direction.RIGHT
+        case Symbol.RIGHT_BOT_CORNER, Direction.LEFT:
+            return Direction.DOWN
+        
+        case Symbol.LEFT_BOT_CORNER, Direction.UP:
+            return Direction.LEFT
+        case Symbol.LEFT_BOT_CORNER, Direction.RIGHT:
+            return Direction.DOWN
+        
+        case Symbol.RIGHT_TOP_CORNER, Direction.DOWN:
+            return Direction.RIGHT
+        case Symbol.RIGHT_TOP_CORNER, Direction.LEFT:
+            return Direction.UP
+        
+        case Symbol.LEFT_TOP_CORNER, Direction.DOWN:
+            return Direction.LEFT
+        case Symbol.LEFT_TOP_CORNER, Direction.RIGHT:
+            return Direction.UP
+
+        case Symbol.HOR_CROSS, _: return dir
+        case Symbol.VERT_CROSS, _: return dir
+
+        case Symbol.DIAG1, Direction.RIGHT:
+            return Direction.UP
+        case Symbol.DIAG1, Direction.LEFT:
+            return Direction.DOWN
+        case Symbol.DIAG1, Direction.DOWN:
+            return Direction.LEFT
+        case Symbol.DIAG1, Direction.UP:
+            return Direction.RIGHT
+
+        case Symbol.DIAG2, Direction.RIGHT:
+            return Direction.DOWN
+        case Symbol.DIAG2, Direction.LEFT:
+            return Direction.UP
+        case Symbol.DIAG2, Direction.DOWN:
+            return Direction.RIGHT
+        case Symbol.DIAG2, Direction.UP:
+            return Direction.LEFT
+        
+        case Symbol.EMPTY: return Direction.NONE
+
+        case _: return Direction.NONE
+        
 
 def find_possible_dir(symbol: Symbol) -> Direction:
     for dir in Direction:
@@ -246,23 +197,6 @@ class Knot:
     def get_size(self):
         return (len(self.matrix), len(self.matrix[0]))
 
-    def draw(self):
-        size = self.get_size()
-        shape = (size[0]*5, size[1]*5)
-        im = np.zeros(shape)
-
-        for i in range(size[0]):
-            for j in range(size[1]):
-                im[i*5:(i+1)*5, j*5:(j+1)*5] = symbol_representations[self.matrix[i][j]]
-
-                plt.text(j*5+1, i*5+1, str(self.matrix[i][j]), ha="center", va="center")
-
-        plt.imshow(im, cmap='gray_r')
-        plt.grid(True)
-        plt.xticks(np.arange(0, shape[1], 5), range(size[1]))
-        plt.yticks(np.arange(0, shape[0], 5), range(size[0]))
-
-        plt.show()
 
     def first_crossing_coords(self) -> tuple[int, int]:
         size = self.get_size()
@@ -288,11 +222,11 @@ class Knot:
 
         return Knot(matrix1), Knot(matrix2)
     
-    def walk_from(self, start_coords: tuple[int, int], start_dir: Direction = None) -> list[tuple[int, int]]:
+    def walk_from(self, start_coords: tuple[int, int], start_dir: Direction = Direction.NONE) -> list[tuple[int, int]]:
         first_cell = self.get_cell_at(start_coords)
         knot_cells = [start_coords]
         
-        start_dir = start_dir if start_dir else find_possible_dir(Symbol(first_cell))
+        start_dir = start_dir if start_dir != Direction.NONE else find_possible_dir(Symbol(first_cell))
         current_dir = start_dir
         if current_dir == Direction.NONE: return []
 
@@ -416,7 +350,7 @@ class KauffmanPol:
     def __mul__(self: "KauffmanPol", p: "KauffmanPol"):
         pol1 = self.pol.copy()
         pol2 = p.pol.copy()
-        prod = {}
+        prod: dict[int, int] = {}
         for exp1 in pol1:
             for exp2 in pol2:
                 exp = exp1 + exp2
@@ -425,7 +359,7 @@ class KauffmanPol:
                 prod[exp] = coeff + pol1[exp1] * pol2[exp2]
         return KauffmanPol(prod)
     
-    def pow(self, exp):
+    def pow(self, exp: int):
         res = KauffmanPol({0: 1})
         for _ in range(exp):
             res *= self
@@ -463,19 +397,21 @@ d = KauffmanPol({-2:-1, 2:-1})
 
 
 def kauffman(k: Knot) -> KauffmanPol:
-    def kauffmanR(k: Knot, p: dict[int, int], i=0):
+    def kauffmanR(k: Knot, p: dict[int, int], i: int = 0) -> KauffmanPol:
         first_cross_coords = k.first_crossing_coords()
         if first_cross_coords == (-1, -1):
             unknots_count = k.count_unknots()
             return d.pow(unknots_count-1)
 
         k1, k2 = k.uncross(first_cross_coords)
-        # print(f"╭─ i={i} ─────────")
-        # print(f"│ a. \n")
-        # print(k1)
-        # print(f"\n│ b. \n")
-        # print(k2)
-        # print("╰─────────────────")
+
+        if verbose_mode: 
+            print(f"╭─ i={i} ─────────")
+            print(f"│ a. \n")
+            print(k1)
+            print(f"\n│ b. \n")
+            print(k2)
+            print("╰─────────────────")
 
         return a*kauffmanR(k1, p, i+1) + b*kauffmanR(k2, p, i+1)
     return kauffmanR(k, {})
@@ -514,7 +450,7 @@ if __name__ == "__main__":
     ])
 
 
-    # print(left_trefoil)
-    # print(kauffman(left_trefoil))
+    print(kauffman(left_trefoil))
+    print(left_trefoil)
 
-    print(kauffman(unknot))
+    # print(kauffman(unknot))
