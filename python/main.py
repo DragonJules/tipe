@@ -359,6 +359,9 @@ class KauffmanPol:
                 prod[exp] = coeff + pol1[exp1] * pol2[exp2]
         return KauffmanPol(prod)
     
+    def __rmul__(self: "KauffmanPol", coeff: int):
+        return KauffmanPol({key: coeff * val for key, val in self.pol.items()})
+    
     def pow(self, exp: int):
         res = KauffmanPol({0: 1})
         for _ in range(exp):
@@ -401,6 +404,10 @@ def kauffman(k: Knot) -> KauffmanPol:
         first_cross_coords = k.first_crossing_coords()
         if first_cross_coords == (-1, -1):
             unknots_count = k.count_unknots()
+            if verbose_mode: 
+                print(f"╭─ i={i} ─────────")
+                print(f"│ found {unknots_count} unknots")
+                print("╰─────────────────")
             return d.pow(unknots_count-1)
 
         k1, k2 = k.uncross(first_cross_coords)
@@ -449,8 +456,28 @@ if __name__ == "__main__":
         [5, 6]
     ])
 
+    k3 = Knot([[3,1,1,4,0],[2,0,3,8,4],[2,3,8,6,2],[5,8,6,0,2],[0,5,1,1,6]])
+    
 
-    print(kauffman(left_trefoil))
-    print(left_trefoil)
+    # print(kauffman(left_trefoil))
+    # print(left_trefoil)
+
+
+
+    print(kauffman(k3))
+    print(k3)
+
+    a2 = a.pow(2)
+    a3 = a.pow(3)
+    b2 = b.pow(2)
+    b3 = b.pow(3)
+    d2 = d.pow(2)
+    d3 = d.pow(3)
+
+    print(a3*d3 + 3*a2*b*d2 + 3*a*b2*d + b3*d2)
+
+
+    # print(d.pow(2))
+    # print(d.pow(3))
 
     # print(kauffman(unknot))

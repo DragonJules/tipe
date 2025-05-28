@@ -1,0 +1,17 @@
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #222233;
+    height: 100svh;
+    overflow: hidden;
+}
+
+/* canvas {
+    width: 100%;
+    height: 100%;
+    /* background-color: red; 
+}*/
