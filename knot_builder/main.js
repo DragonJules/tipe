@@ -1,12 +1,29 @@
+const draw_cursor = "url(\"data:image/svg+xml,%3Csvg width='26px' height='26px' viewBox='0 0 48 48' xmlns='http://www.w3.org/2000/svg' fill='%23ffffff' stroke='%23ffffff' stroke-width='0'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Ctitle%3Epencil-solid%3C/title%3E%3Cg id='Layer_2' data-name='Layer 2'%3E%3Cg id='invisible_box' data-name='invisible box'%3E%3Crect width='48' height='48' fill='none'%3E%3C/rect%3E%3C/g%3E%3Cg id='icons_Q2' data-name='icons Q2'%3E%3Cpath d='M43.4,18.8,29.3,4.6a1.9,1.9,0,0,0-2.8,0l-6,6,16.9,17,6-6A1.9,1.9,0,0,0,43.4,18.8ZM4.6,26.5A2,2,0,0,0,4,27.9V42a2,2,0,0,0,2,2H20.1a2,2,0,0,0,1.4-.6l13.1-13-17-16.9Z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E\") 13 13, auto"
+const rotate_cursor = "url(\"data:image/svg+xml,%3Csvg width='32px' height='32px' viewBox='0 0 42 42' version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill='%23ffffff' xml:space='preserve' stroke='%23ffffff' stroke-width='' transform='rotate(0)'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round' stroke='%23ffffff' stroke-width='1'%3E%3Cg%3E%3Cpath d='M32.076,15.138l-7.152,9.341l-7.152-9.341h4.666c-0.451-4.397-4.178-7.842-8.695-7.842C8.922,7.296,5,11.218,5,16.038 c0,4.82,3.922,8.742,8.742,8.742c1.381,0,2.5,1.119,2.5,2.5s-1.119,2.5-2.5,2.5C6.166,29.78,0,23.615,0,16.038 S6.166,2.296,13.742,2.296c7.273,0,13.23,5.686,13.697,12.842H32.076z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cg%3E%3Cpath d='M32.076,15.138l-7.152,9.341l-7.152-9.341h4.666c-0.451-4.397-4.178-7.842-8.695-7.842C8.922,7.296,5,11.218,5,16.038 c0,4.82,3.922,8.742,8.742,8.742c1.381,0,2.5,1.119,2.5,2.5s-1.119,2.5-2.5,2.5C6.166,29.78,0,23.615,0,16.038 S6.166,2.296,13.742,2.296c7.273,0,13.23,5.686,13.697,12.842H32.076z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E\") 11 14, auto"
+const erase_cursor = "url(\"data:image/svg+xml,%3Csvg width='30px' height='30px' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cpath d='M11.4096 5.50506C13.0796 3.83502 13.9146 3 14.9522 3C15.9899 3 16.8249 3.83502 18.4949 5.50506C20.165 7.1751 21 8.01013 21 9.04776C21 10.0854 20.165 10.9204 18.4949 12.5904L14.3017 16.7837L7.21634 9.69828L11.4096 5.50506Z' fill='%23ffffff'%3E%3C/path%3E%3Cpath d='M6.1557 10.759L13.2411 17.8443L12.5904 18.4949C12.2127 18.8727 11.8777 19.2077 11.5734 19.5H21C21.4142 19.5 21.75 19.8358 21.75 20.25C21.75 20.6642 21.4142 21 21 21H9C7.98423 20.9747 7.1494 20.1393 5.50506 18.4949C3.83502 16.8249 3 15.9899 3 14.9522C3 13.9146 3.83502 13.0796 5.50506 11.4096L6.1557 10.759Z' fill='%23ffffff'%3E%3C/path%3E%3C/g%3E%3C/svg%3E\") 15 15, auto"
+
+const cursors = {
+    draw: draw_cursor,
+    erase: erase_cursor,
+    rotate: rotate_cursor
+}
+
 const cell_size = { x: 50, y: 50 };
 
-const canvas = document.querySelector(".grid");
-const ctx = canvas.getContext("2d");
+const grid_canvas = document.querySelector("canvas.grid");
+const grid_ctx = grid_canvas.getContext("2d");
+
+const knot_canvas = document.querySelector("canvas.knot");
+const ctx = knot_canvas.getContext("2d");
 
 const window_width = window.innerWidth;
 const window_height = window.innerHeight;
-canvas.width = window_width;
-canvas.height = window_height;
+
+grid_canvas.width = window_width;
+grid_canvas.height = window_height
+
+knot_canvas.width = window_width;
+knot_canvas.height = window_height
 
 const grid_height = Math.floor(window_height / cell_size.y);
 const grid_width = Math.floor(window_width / cell_size.x);
@@ -14,24 +31,38 @@ const grid_width = Math.floor(window_width / cell_size.x);
 const grid = Array(grid_height).fill(0).map(() => Array(grid_width).fill(0));
 
 function drawGrid() {
-    ctx.strokeStyle = "#333355";
-    ctx.lineWidth = 2;
+    grid_ctx.clearRect(0, 0, grid_canvas.width, grid_canvas.height);
 
-    ctx.beginPath();
-    for (var x = 1; x < canvas.width; x += cell_size.x) {
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, window_height);
+    grid_ctx.strokeStyle = "#333355";
+    grid_ctx.lineWidth = 2;
+
+    grid_ctx.beginPath();
+    for (var x = 1; x < grid_canvas.width; x += cell_size.x) {
+        grid_ctx.moveTo(x, 0);
+        grid_ctx.lineTo(x, window_height);
     }
     
-    for (var y = 1; y < canvas.height; y += cell_size.y) {
-        ctx.moveTo(0, y);
-        ctx.lineTo(window_width, y);
+    for (var y = 1; y < grid_canvas.height; y += cell_size.y) {
+        grid_ctx.moveTo(0, y);
+        grid_ctx.lineTo(window_width, y);
     }
-    ctx.stroke();
+    grid_ctx.stroke();
 }
 
+function highlightCell(x, y) {
+    const top = y * cell_size.y;
+    const left = x * cell_size.x;
 
-drawGrid();
+    grid_ctx.strokeStyle = "#8888aa";
+    grid_ctx.lineWidth = 2;
+    grid_ctx.beginPath();
+    grid_ctx.moveTo(left, top);
+    grid_ctx.lineTo(left + cell_size.x, top);
+    grid_ctx.lineTo(left + cell_size.x, top + cell_size.y);
+    grid_ctx.lineTo(left, top + cell_size.y);
+    grid_ctx.lineTo(left, top);
+    grid_ctx.stroke();
+}
 
 function getCoords(e) {
   const coords = {
@@ -53,10 +84,9 @@ function clearCell(x, y) {
     const top = y * cell_size.y;
     const left = x * cell_size.x;
 
-    ctx.clearRect(left, top, cell_size.x, cell_size.y);
-
-    drawGrid();
+    ctx.clearRect(left, top, cell_size.x + 1, cell_size.y + 1);
 }
+
 
 function draw_symbol(x, y, code) {
     const top = y * cell_size.y;
@@ -170,13 +200,7 @@ function getKnotShape() {
         }
     }
 
-    return {
-        top,
-        left,
-        right,
-        bottom
-    }
-
+    return { top, left, right, bottom }
 }
 
 function getKnot() {
@@ -186,8 +210,6 @@ function getKnot() {
 
     return grid_copy.map(arr => arr.slice(knotShape.left, knotShape.right + 1)).slice(knotShape.top, knotShape.bottom + 1)
 }
-
-let mode = "draw"
 
 function getNextSymbol(symbol, next=true) {
     switch (symbol) {
@@ -218,10 +240,10 @@ function getRotatedSymbol(symbol, clockwise=true) {
         case 1: return 2
         case 2: return 1
 
-        case 3: return clockwise ? 4 : 6
-        case 4: return clockwise ? 5 : 3
-        case 5: return clockwise ? 6 : 4
-        case 6: return clockwise ? 3 : 5
+        case 3: return clockwise ? 4 : 5
+        case 4: return clockwise ? 6 : 3
+        case 5: return clockwise ? 3 : 6
+        case 6: return clockwise ? 5 : 4
         
         case 7: return 8
         case 8: return 7
@@ -233,33 +255,50 @@ function getRotatedSymbol(symbol, clockwise=true) {
     }
 }
 
-canvas.addEventListener("click", (e) => {
+/// ---
+drawGrid();
+
+let mode = "draw"
+document.body.style.cursor = draw_cursor
+
+knot_canvas.addEventListener("click", (e) => {
     e.preventDefault()
     const coords = getCoords(e);
     const symbol = getSymbolAt(coords.x, coords.y);
     
 
-    const next_symbol = (mode == "draw") ? getNextSymbol(symbol):
+    const nextSymbol = (mode == "draw") ? getNextSymbol(symbol):
         (mode == "rotate") ? getRotatedSymbol(symbol) : 
         (mode == "erase") ? 0 : symbol
 
-    setSymbolAt(coords.x, coords.y, next_symbol)
-    draw_symbol(coords.x, coords.y, next_symbol)
+    setSymbolAt(coords.x, coords.y, nextSymbol)
+    draw_symbol(coords.x, coords.y, nextSymbol)
 
 })
 
-canvas.addEventListener("contextmenu", (e) => {
+knot_canvas.addEventListener("contextmenu", (e) => {
     e.preventDefault()
     const coords = getCoords(e);
+    const prev_mode = mode
+
+
+    mode = "erase"
+    document.body.style.cursor = cursors[mode]
+
+    draw_symbol(coords.x, coords.y, 0)
+    setSymbolAt(coords.x, coords.y, 0)
+
+    mode = prev_mode
+    document.body.style.cursor = cursors[mode]
+
+})
+
+knot_canvas.addEventListener("wheel", (e) => {
+    const coords = getCoords(e);
     const symbol = getSymbolAt(coords.x, coords.y);
-
-    const next_symbol = (mode == "draw") ? getNextSymbol(symbol, false):
-        (mode == "rotate") ? getRotatedSymbol(symbol, false) : 
-        (mode == "erase") ? 0 : symbol
-
-    draw_symbol(coords.x, coords.y, next_symbol)
-    setSymbolAt(coords.x, coords.y, next_symbol)
-
+    const rotateSymbol = getRotatedSymbol(symbol, e.deltaY < 0)
+    setSymbolAt(coords.x, coords.y, rotateSymbol)
+    draw_symbol(coords.x, coords.y, rotateSymbol)
 })
 
 window.addEventListener("keypress", (e) => {
@@ -271,20 +310,24 @@ window.addEventListener("keypress", (e) => {
     switch (e.key) {
         case "d":
             mode = "draw"
-            document.body.style.cursor = "crosshair"
             break;
         case "r":
             mode = "rotate"
-            document.body.style.cursor = "url(\"data:image/svg+xml,%3Csvg fill='%23000000' version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='26px' height='36px' viewBox='-13 -4.49 51.06 41.06' xml:space='preserve' stroke='%23000000' stroke-width='' transform='rotate(0)'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round' stroke='%23ffffff' stroke-width='5'%3E%3Cg%3E%3Cpath d='M32.076,15.138l-7.152,9.341l-7.152-9.341h4.666c-0.451-4.397-4.178-7.842-8.695-7.842C8.922,7.296,5,11.218,5,16.038 c0,4.82,3.922,8.742,8.742,8.742c1.381,0,2.5,1.119,2.5,2.5s-1.119,2.5-2.5,2.5C6.166,29.78,0,23.615,0,16.038 S6.166,2.296,13.742,2.296c7.273,0,13.23,5.686,13.697,12.842H32.076z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cg%3E%3Cpath d='M32.076,15.138l-7.152,9.341l-7.152-9.341h4.666c-0.451-4.397-4.178-7.842-8.695-7.842C8.922,7.296,5,11.218,5,16.038 c0,4.82,3.922,8.742,8.742,8.742c1.381,0,2.5,1.119,2.5,2.5s-1.119,2.5-2.5,2.5C6.166,29.78,0,23.615,0,16.038 S6.166,2.296,13.742,2.296c7.273,0,13.23,5.686,13.697,12.842H32.076z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E\") 16 16, auto"
             break;
         case "e":
             mode = "erase"
-            document.body.style.cursor = "url(\"data:image/svg+xml,%3Csvg width='26px' height='36px' viewBox='-1.44 -1.44 18.88 18.88' xmlns='http://www.w3.org/2000/svg' fill='%23000000' class='bi bi-eraser' stroke='%23000000' stroke-width='1.04'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round' stroke='%23ffffff' stroke-width='2.2399999999999998'%3E%3Cpath d='M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm2.121.707a1 1 0 0 0-1.414 0L4.16 7.547l5.293 5.293 4.633-4.633a1 1 0 0 0 0-1.414l-3.879-3.879zM8.746 13.547 3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z'%3E%3C/path%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cpath d='M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm2.121.707a1 1 0 0 0-1.414 0L4.16 7.547l5.293 5.293 4.633-4.633a1 1 0 0 0 0-1.414l-3.879-3.879zM8.746 13.547 3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z'%3E%3C/path%3E%3C/g%3E%3C/svg%3E\") 16 16, auto"
             break;
-        
+
         default:
             break;
     }
 
+    document.body.style.cursor = cursors[mode]
 
+})
+
+window.addEventListener("mousemove", (e) => {
+    const coords = getCoords(e);
+    drawGrid();
+    highlightCell(coords.x, coords.y)
 })
