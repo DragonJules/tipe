@@ -33,7 +33,7 @@ const grid = Array(grid_height).fill(0).map(() => Array(grid_width).fill(0));
 function drawGrid() {
     grid_ctx.clearRect(0, 0, grid_canvas.width, grid_canvas.height);
 
-    grid_ctx.strokeStyle = "#333355";
+    grid_ctx.strokeStyle = "#333343";
     grid_ctx.lineWidth = 2;
 
     grid_ctx.beginPath();
@@ -258,6 +258,22 @@ function getRotatedSymbol(symbol, clockwise=true) {
 /// ---
 drawGrid();
 
+const lastKnot = getCookie("last_knot")
+if (lastKnot != "") {
+    const knot = JSON.parse(lastKnot)
+    const size = [knot.length, knot[0].length]
+
+    const top = Math.floor(grid_height/2 - size[0]/2)
+    const left = Math.floor(grid_width/2 - size[1]/2)
+
+    for (let y = 0; y < size[0]; y++) {
+        for (let x = 0; x < size[1]; x++) {
+            setSymbolAt(left + x, top + y, knot[y][x])
+            draw_symbol(left + x, top + y, knot[y][x])
+        }
+    }
+}
+
 let mode = "draw"
 document.body.style.cursor = draw_cursor
 
@@ -274,6 +290,7 @@ knot_canvas.addEventListener("click", (e) => {
     setSymbolAt(coords.x, coords.y, nextSymbol)
     draw_symbol(coords.x, coords.y, nextSymbol)
 
+    saveKnot()
 })
 
 knot_canvas.addEventListener("contextmenu", (e) => {
@@ -291,14 +308,18 @@ knot_canvas.addEventListener("contextmenu", (e) => {
     mode = prev_mode
     document.body.style.cursor = cursors[mode]
 
+    saveKnot()
 })
 
 knot_canvas.addEventListener("wheel", (e) => {
     const coords = getCoords(e);
     const symbol = getSymbolAt(coords.x, coords.y);
     const rotateSymbol = getRotatedSymbol(symbol, e.deltaY < 0)
+
     setSymbolAt(coords.x, coords.y, rotateSymbol)
     draw_symbol(coords.x, coords.y, rotateSymbol)
+
+    saveKnot()
 })
 
 window.addEventListener("keypress", (e) => {
@@ -331,3 +352,32 @@ window.addEventListener("mousemove", (e) => {
     drawGrid();
     highlightCell(coords.x, coords.y)
 })
+
+function saveKnot() {
+    const knot = getKnot()
+    setCookie("last_knot", JSON.stringify(knot), 365)
+}
+
+
+function setCookie(cname, cvalue, exdays) {
+    const d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    let expires = "expires="+ d.toUTCString();
+    document.cookie = `${cname}=${cvalue};${expires};path=/`;
+}
+
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+        c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}

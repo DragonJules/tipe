@@ -1,5 +1,5 @@
 from enum import Enum
-
+import json
 from copy import deepcopy
 
 import sys
@@ -294,15 +294,12 @@ class Knot:
     def count_unknots(self):
         """assuming knot is only disjoint unknots"""
 
-        i = 0
-
         unknots_count = 0
         k = self
-        while (first_symbol_coords := k.find_first_symbol()) != (-1, -1) and i<10:
+        while (first_symbol_coords := k.find_first_symbol()) != (-1, -1):
             k = k.remove_unknot(k.walk_from(first_symbol_coords))
 
             unknots_count += 1
-            i+=1
         return unknots_count
     
     def __str__(self):
@@ -426,7 +423,7 @@ def kauffman(k: Knot) -> KauffmanPol:
     
 
 
-if __name__ == "__main__":
+def test():
 
     k1 = Knot([
         [0, 3, 4, 0, 0],
@@ -464,23 +461,19 @@ if __name__ == "__main__":
 
     figure8 = Knot([[0,0,3,4,0],[3,1,8,7,4],[2,3,7,6,2],[5,7,6,0,2],[0,5,1,1,6]])
 
-    monster = Knot([[0,0,0,0,0,0,3,1,1,4,0,0,0],[3,1,4,0,3,1,7,4,0,5,1,4,0],[2,3,6,3,7,1,6,5,4,3,4,2,0],[5,7,1,8,7,4,3,1,7,8,6,5,4],[0,2,3,7,6,5,7,1,8,7,1,4,2],[0,5,7,6,0,3,7,1,7,8,1,7,6],[0,0,5,1,1,7,7,1,9,6,0,2,0],[0,0,0,0,0,5,7,1,7,1,1,6,0],[0,0,0,0,0,0,5,1,6,0,0,0,0]])
+    print(kauffman(figure8))
 
-    print(kauffman(monster))
-    print(monster)
-
-    # a2 = a.pow(2)
-    # a3 = a.pow(3)
-    # b2 = b.pow(2)
-    # b3 = b.pow(3)
-    # d2 = d.pow(2)
-    # d3 = d.pow(3)
-
-    # print(a3*d3 + 3*a2*b*d2 + 3*a*b2*d + b3*d2)
+    print(k1, k2, k3, unknot, left_trefoil)
 
 
+if __name__ == "__main__":
+    if sysargs.count("-t") > 0:
+        test()
 
-    # print(d.pow(2))
-    # print(d.pow(3))
-
-    # print(kauffman(unknot))
+    elif sysargs.count("-k") > 0:
+        try:
+            k = Knot(json.loads(sysargs[sysargs.index("-k")+1]))
+            print(kauffman(k))
+        except:
+            print("invalid knot")
+ 
