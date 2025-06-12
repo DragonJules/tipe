@@ -6,7 +6,7 @@ import sys
 sysargs = sys.argv
 
 verbose_mode = False
-if len(sysargs) > 1 and sysargs[1] == '-v':
+if sysargs.count("-v") > 0:
     verbose_mode = True
 
 symbol_str_representations = [
@@ -474,6 +474,8 @@ if __name__ == "__main__":
         try:
             k = Knot(json.loads(sysargs[sysargs.index("-k")+1]))
             print(kauffman(k))
+            if verbose_mode:
+                print(k)
         except:
             print("invalid knot")
  
