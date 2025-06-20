@@ -2,13 +2,35 @@ const draw_cursor = "url(\"data:image/svg+xml,%3Csvg width='26px' height='26px' 
 const rotate_cursor = "url(\"data:image/svg+xml,%3Csvg width='32px' height='32px' viewBox='0 0 42 42' version='1.1' id='Capa_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' fill='%23ffffff' xml:space='preserve' stroke='%23ffffff' stroke-width='' transform='rotate(0)'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round' stroke='%23ffffff' stroke-width='1'%3E%3Cg%3E%3Cpath d='M32.076,15.138l-7.152,9.341l-7.152-9.341h4.666c-0.451-4.397-4.178-7.842-8.695-7.842C8.922,7.296,5,11.218,5,16.038 c0,4.82,3.922,8.742,8.742,8.742c1.381,0,2.5,1.119,2.5,2.5s-1.119,2.5-2.5,2.5C6.166,29.78,0,23.615,0,16.038 S6.166,2.296,13.742,2.296c7.273,0,13.23,5.686,13.697,12.842H32.076z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cg%3E%3Cpath d='M32.076,15.138l-7.152,9.341l-7.152-9.341h4.666c-0.451-4.397-4.178-7.842-8.695-7.842C8.922,7.296,5,11.218,5,16.038 c0,4.82,3.922,8.742,8.742,8.742c1.381,0,2.5,1.119,2.5,2.5s-1.119,2.5-2.5,2.5C6.166,29.78,0,23.615,0,16.038 S6.166,2.296,13.742,2.296c7.273,0,13.23,5.686,13.697,12.842H32.076z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E\") 11 14, auto"
 const erase_cursor = "url(\"data:image/svg+xml,%3Csvg width='30px' height='30px' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='SVGRepo_bgCarrier' stroke-width='0'%3E%3C/g%3E%3Cg id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'%3E%3C/g%3E%3Cg id='SVGRepo_iconCarrier'%3E%3Cpath d='M11.4096 5.50506C13.0796 3.83502 13.9146 3 14.9522 3C15.9899 3 16.8249 3.83502 18.4949 5.50506C20.165 7.1751 21 8.01013 21 9.04776C21 10.0854 20.165 10.9204 18.4949 12.5904L14.3017 16.7837L7.21634 9.69828L11.4096 5.50506Z' fill='%23ffffff'%3E%3C/path%3E%3Cpath d='M6.1557 10.759L13.2411 17.8443L12.5904 18.4949C12.2127 18.8727 11.8777 19.2077 11.5734 19.5H21C21.4142 19.5 21.75 19.8358 21.75 20.25C21.75 20.6642 21.4142 21 21 21H9C7.98423 20.9747 7.1494 20.1393 5.50506 18.4949C3.83502 16.8249 3 15.9899 3 14.9522C3 13.9146 3.83502 13.0796 5.50506 11.4096L6.1557 10.759Z' fill='%23ffffff'%3E%3C/path%3E%3C/g%3E%3C/svg%3E\") 15 15, auto"
 
+const themes = {
+    dark: "darkMode",
+    light: "lightMode"
+}
+
+let theme = themes.dark
+
+const colors = {
+    darkMode: {
+        background: "#22222f",
+        dark: "#333343",
+        medium: "#8888aa",
+        light: "#E6E9EF"
+    },
+    lightMode: {
+        background: "#E6E9EF",
+        dark: "#D3D9E5",
+        medium: "#AEB1B7",
+        light: "#111121"
+    }
+}
+
 const cursors = {
     draw: draw_cursor,
     erase: erase_cursor,
     rotate: rotate_cursor
 }
 
-const cell_size = { x: 50, y: 50 };
+const cell_size = { x: 100, y: 100 };
 
 const grid_canvas = document.querySelector("canvas.grid");
 const grid_ctx = grid_canvas.getContext("2d");
@@ -33,7 +55,7 @@ const grid = Array(grid_height).fill(0).map(() => Array(grid_width).fill(0));
 function drawGrid() {
     grid_ctx.clearRect(0, 0, grid_canvas.width, grid_canvas.height);
 
-    grid_ctx.strokeStyle = "#333343";
+    grid_ctx.strokeStyle = colors[theme].dark;
     grid_ctx.lineWidth = 2;
 
     grid_ctx.beginPath();
@@ -53,7 +75,7 @@ function highlightCell(x, y) {
     const top = y * cell_size.y;
     const left = x * cell_size.x;
 
-    grid_ctx.strokeStyle = "#8888aa";
+    grid_ctx.strokeStyle = colors[theme].medium;
     grid_ctx.lineWidth = 2;
     grid_ctx.beginPath();
     grid_ctx.moveTo(left, top);
@@ -88,7 +110,7 @@ function clearCell(x, y) {
 }
 
 
-function draw_symbol(x, y, code) {
+function drawSymbol(x, y, code) {
     const top = y * cell_size.y;
     const left = x * cell_size.x;
 
@@ -97,8 +119,8 @@ function draw_symbol(x, y, code) {
 
     clearCell(x, y);
 
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = colors[theme].light;
+    ctx.lineWidth = 5;
     ctx.beginPath();
     switch (code) {
         case 1:
@@ -255,6 +277,25 @@ function getRotatedSymbol(symbol, clockwise=true) {
     }
 }
 
+function drawKnot() {
+    for (let y = 0; y < grid_height; y++) {
+        for (let x = 0; x < grid_width; x++) {
+            drawSymbol(x, y, grid[y][x])
+        }
+    }
+}
+
+function resetDisplay() {
+    ctx.reset()
+    grid_ctx.reset()
+    drawGrid()
+    drawKnot()
+}
+
+function setBackgroundColor(color) {
+    document.body.style.backgroundColor = color
+}
+
 /// ---
 drawGrid();
 
@@ -269,9 +310,9 @@ if (lastKnot != "") {
     for (let y = 0; y < size[0]; y++) {
         for (let x = 0; x < size[1]; x++) {
             setSymbolAt(left + x, top + y, knot[y][x])
-            draw_symbol(left + x, top + y, knot[y][x])
         }
     }
+    drawKnot()
 }
 
 let mode = "draw"
@@ -288,7 +329,7 @@ knot_canvas.addEventListener("click", (e) => {
         (mode == "erase") ? 0 : symbol
 
     setSymbolAt(coords.x, coords.y, nextSymbol)
-    draw_symbol(coords.x, coords.y, nextSymbol)
+    drawSymbol(coords.x, coords.y, nextSymbol)
 
     saveKnot()
 })
@@ -302,7 +343,7 @@ knot_canvas.addEventListener("contextmenu", (e) => {
     mode = "erase"
     document.body.style.cursor = cursors[mode]
 
-    draw_symbol(coords.x, coords.y, 0)
+    drawSymbol(coords.x, coords.y, 0)
     setSymbolAt(coords.x, coords.y, 0)
 
     mode = prev_mode
@@ -317,7 +358,7 @@ knot_canvas.addEventListener("wheel", (e) => {
     const rotateSymbol = getRotatedSymbol(symbol, e.deltaY < 0)
 
     setSymbolAt(coords.x, coords.y, rotateSymbol)
-    draw_symbol(coords.x, coords.y, rotateSymbol)
+    drawSymbol(coords.x, coords.y, rotateSymbol)
 
     saveKnot()
 })
@@ -326,6 +367,12 @@ window.addEventListener("keypress", (e) => {
     if (e.key == "c") {
         const knot = getKnot()
         navigator.clipboard.writeText(JSON.stringify(knot))
+    }
+
+    if (e.key == "t") {
+        theme = theme == themes.dark ? themes.light : themes.dark
+        setBackgroundColor(colors[theme].background)
+        resetDisplay()
     }
 
     switch (e.key) {

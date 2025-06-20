@@ -6,9 +6,8 @@ import sys
 sysargs = sys.argv
 
 verbose_mode = False
-if sysargs.count("-v") > 0:
-    verbose_mode = True
 
+# symbol string representations to be used for printing
 symbol_str_representations = [
     ["       ",
      "       ",
@@ -109,6 +108,16 @@ def opposite_dir(dir: Direction) -> Direction:
         case Direction.NONE: return Direction.NONE
      
 def walk_symbol(symbol: Symbol, dir: Direction) -> Direction:
+    """
+    Returns the direction in which the walk should continue after encountering the given symbol in the given direction.
+
+    This function assumes that the walk is coming from the opposite direction of the given direction.
+
+    :param symbol: The symbol encountered during the walk.
+    :param dir: The direction from which the walk encountered the symbol.
+
+    :return: The direction in which the walk should continue. If the walk should stop, returns Direction.NONE.
+    """
     if not opening(symbol, opposite_dir(dir)):
         return Direction.NONE
 
@@ -188,7 +197,20 @@ def get_direct_neighbours(coords: tuple[int, int]) -> list[tuple[int, int]]:
 
 
 class Knot:
+    """
+    Represents a knot using a matrix of symbols.
+
+    The Knot class provides methods to manipulate and analyze a knot diagram,
+    represented as a matrix of symbols.
+
+    :param matrix: A 2D list representing the knot diagram using symbols.
+    
+    Attributes:
+        matrix (list[list[int]]): A 2D list representing the knot diagram using symbols.
+    """
+
     def __init__(self, matrix: list[list[int]] = []):
+        """:param matrix: A 2D list representing the knot diagram using symbols."""
         self.matrix: list[list[int]] = matrix
 
     def get_cell_at(self, coords: tuple[int, int]):
@@ -208,6 +230,13 @@ class Knot:
         return -1, -1
     
     def uncross(self, crossing_coords: tuple[int, int]) -> tuple["Knot", "Knot"]:
+        """
+        Returns two new knots, each one resulting from a different resolution of the crossing at the given coordinates, following the rules of Kauffman's bracket.
+
+        :param crossing_coords: The coordinates of the crossing to be resolved.
+        :return: A tuple of two knots, each one resulting from a different resolution of the crossing.
+        """
+
         crossing = self.get_cell_at(crossing_coords)
 
         matrix1 = deepcopy(self.matrix)
@@ -223,6 +252,15 @@ class Knot:
         return Knot(matrix1), Knot(matrix2)
     
     def walk_from(self, start_coords: tuple[int, int], start_dir: Direction = Direction.NONE) -> list[tuple[int, int]]:
+        """
+        Walks through the knot, starting from the given start position and direction.
+
+        :param start_coords: The coordinates of the starting position.
+        :param start_dir: The direction to go from the starting position. If not specified, the function tries to find a possible direction.
+
+        :returns: A list of all the coordinates in the order they are encountered during the walk.
+        """
+
         first_cell = self.get_cell_at(start_coords)
         knot_cells = [start_coords]
         
@@ -254,9 +292,15 @@ class Knot:
         return -1, -1
 
     def remove_unknot(self, coords_list: list[tuple[int, int]]) -> "Knot":
-        """assuming knot is only disjoint unknots"""
-        dup_matrix = deepcopy(self.matrix)
+        """
+        Removes an unknot from the knot matrix based on the given coordinates list.
 
+        :param coords_list: A list of coordinates representing the positions of the 
+                            unknot in the matrix.
+        :returns: A new Knot instance with the unknot removed.
+        """
+
+        dup_matrix = deepcopy(self.matrix)
 
         for i, coords in enumerate(coords_list):
             symbol = Symbol(self.get_cell_at(coords))
@@ -292,8 +336,12 @@ class Knot:
             
 
     def count_unknots(self):
-        """assuming knot is only disjoint unknots"""
+        """
+        Returns the number of disjoint unknots in the given knot.
 
+        This function assumes that self is only disjoint unknots.
+        """
+        
         unknots_count = 0
         k = self
         while (first_symbol_coords := k.find_first_symbol()) != (-1, -1):
@@ -323,6 +371,11 @@ class Knot:
 # by a dictionary where keys are powers of the indeterminate a and the values are the coefficients
 # of a^key
 class KauffmanPol:
+    """
+    Represents a Kauffman polynomial.
+
+    Implements addition, subtraction and multiplication for Kauffman polynomials.
+    """
     def __init__(self, pol: dict[int, int] = {}):
         self.pol = pol
 
@@ -374,7 +427,7 @@ class KauffmanPol:
             sign_str = "+" if coeff > 0 else "-"
             pos_coeff_nb = abs(coeff) if abs(coeff) != 1 or exp == 0 else ""
             if exp == 0: return f"{sign_str} {pos_coeff_nb}"
-            return f"{sign_str} {pos_coeff_nb}a"
+            return f"{sign_str} {pos_coeff_nb}A"
 
         def exp_str(exp: int, coeff: int) -> str:
             if exp == 1 or exp == 0: return ""
@@ -391,25 +444,36 @@ class KauffmanPol:
         return ''.join(pol_str_list)
 
 
+# Kauffman's polynomial indeterminate
 a = KauffmanPol({1:1})
 b = KauffmanPol({-1:1})
 d = KauffmanPol({-2:-1, 2:-1})
 
 
 def kauffman(k: Knot) -> KauffmanPol:
-    def kauffmanR(k: Knot, p: dict[int, int], i: int = 0) -> KauffmanPol:
+    """
+        implementation of kauffman algorithm
+
+        :param k: any knot
+        :returns: the kauffman polynomial of the given knot
+    """
+    def kauffmanR(k: Knot, i: int = 0) -> KauffmanPol:
+        # recursive implementation of kauffman algorithm
+        # i is the current recursion level, used for verbose printing
+
         first_cross_coords = k.first_crossing_coords()
         if first_cross_coords == (-1, -1):
             unknots_count = k.count_unknots()
-            if verbose_mode: 
-                print(f"╭─ i={i} ─────────")
+            if verbose_mode: # verbose print
+                print(f"╭─ i={i} ───────────")
                 print(f"│ found {unknots_count} unknots")
                 print("╰─────────────────")
+
             return d.pow(unknots_count-1)
 
         k1, k2 = k.uncross(first_cross_coords)
 
-        if verbose_mode: 
+        if verbose_mode: # verbose print
             print(f"╭─ i={i} ─────────")
             print(f"│ a. \n")
             print(k1)
@@ -417,13 +481,14 @@ def kauffman(k: Knot) -> KauffmanPol:
             print(k2)
             print("╰─────────────────")
 
-        return a*kauffmanR(k1, p, i+1) + b*kauffmanR(k2, p, i+1)
-    return kauffmanR(k, {})
+        return a*kauffmanR(k1, i+1) + b*kauffmanR(k2, i+1)
+    return kauffmanR(k)
 
     
 
 
 def test():
+    """used only for testing things"""
 
     k1 = Knot([
         [0, 3, 4, 0, 0],
@@ -455,9 +520,8 @@ def test():
 
     k3 = Knot([[3,1,1,4,0],[2,0,3,8,4],[2,3,8,6,2],[5,8,6,0,2],[0,5,1,1,6]])
     
-
-    # print(kauffman(left_trefoil))
-    # print(left_trefoil)
+    print(kauffman(left_trefoil))
+    print(left_trefoil)
 
     figure8 = Knot([[0,0,3,4,0],[3,1,8,7,4],[2,3,7,6,2],[5,7,6,0,2],[0,5,1,1,6]])
 
@@ -467,15 +531,25 @@ def test():
 
 
 if __name__ == "__main__":
-    if sysargs.count("-t") > 0:
+    if sysargs.count("-v") > 0: # toggle verbose mode
+        verbose_mode = True
+
+    if sysargs.count("-t") > 0: # run tests
         test()
 
-    elif sysargs.count("-k") > 0:
+    elif sysargs.count("-k") > 0: # run kauffman on specified knot
         try:
             k = Knot(json.loads(sysargs[sysargs.index("-k")+1]))
             print(kauffman(k))
             if verbose_mode:
                 print(k)
         except:
-            print("invalid knot")
+            print("Error: invalid knot")
+
+    elif sysargs.count("-d") > 0: # draw specified knot
+        try:
+            k = Knot(json.loads(sysargs[sysargs.index("-d")+1]))
+            print(k)
+        except:
+            print("Error: invalid knot")
  
