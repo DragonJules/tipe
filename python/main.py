@@ -537,7 +537,7 @@ if __name__ == "__main__":
     if sysargs.count("-t") > 0: # run tests
         test()
 
-    elif i:=sysargs.index("-k") != -1: # run kauffman on specified knot
+    elif (i := sysargs.index("-k")) != -1: # run kauffman on specified knot
         try:
             k = Knot(json.loads(sysargs[i+1]))
             print(kauffman(k))
@@ -546,7 +546,7 @@ if __name__ == "__main__":
         except:
             print("Error: invalid knot")
 
-    elif i:=sysargs.index("-d") != -1: # draw specified knot
+    elif (i := sysargs.index("-d")) != -1: # draw specified knot
         try:
             k = Knot(json.loads(sysargs[i+1]))
             print(k)
