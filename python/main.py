@@ -537,18 +537,18 @@ if __name__ == "__main__":
     if sysargs.count("-t") > 0: # run tests
         test()
 
-    elif sysargs.count("-k") > 0: # run kauffman on specified knot
+    elif i:=sysargs.index("-k") != -1: # run kauffman on specified knot
         try:
-            k = Knot(json.loads(sysargs[sysargs.index("-k")+1]))
+            k = Knot(json.loads(sysargs[i+1]))
             print(kauffman(k))
             if verbose_mode:
                 print(k)
         except:
             print("Error: invalid knot")
 
-    elif sysargs.count("-d") > 0: # draw specified knot
+    elif i:=sysargs.index("-d") != -1: # draw specified knot
         try:
-            k = Knot(json.loads(sysargs[sysargs.index("-d")+1]))
+            k = Knot(json.loads(sysargs[i+1]))
             print(k)
         except:
             print("Error: invalid knot")
