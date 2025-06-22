@@ -30,7 +30,7 @@ const cursors = {
     rotate: rotate_cursor
 }
 
-const cell_size = { x: 100, y: 100 };
+const cell_size = { x: 60, y: 60 };
 
 const grid_canvas = document.querySelector("canvas.grid");
 const grid_ctx = grid_canvas.getContext("2d");
@@ -120,7 +120,7 @@ function drawSymbol(x, y, code) {
     clearCell(x, y);
 
     ctx.strokeStyle = colors[theme].light;
-    ctx.lineWidth = 5;
+    ctx.lineWidth = cell_size.y / 20;
     ctx.beginPath();
     switch (code) {
         case 1:
@@ -302,17 +302,19 @@ drawGrid();
 const lastKnot = getCookie("last_knot")
 if (lastKnot != "") {
     const knot = JSON.parse(lastKnot)
-    const size = [knot.length, knot[0].length]
+    if (knot.length > 0 && knot[0].length > 0) {
+        const size = [knot.length, knot[0].length]
 
-    const top = Math.floor(grid_height/2 - size[0]/2)
-    const left = Math.floor(grid_width/2 - size[1]/2)
+        const top = Math.floor(grid_height/2 - size[0]/2)
+        const left = Math.floor(grid_width/2 - size[1]/2)
 
-    for (let y = 0; y < size[0]; y++) {
-        for (let x = 0; x < size[1]; x++) {
-            setSymbolAt(left + x, top + y, knot[y][x])
+        for (let y = 0; y < size[0]; y++) {
+            for (let x = 0; x < size[1]; x++) {
+                setSymbolAt(left + x, top + y, knot[y][x])
+            }
         }
+        drawKnot()
     }
-    drawKnot()
 }
 
 let mode = "draw"

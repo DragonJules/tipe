@@ -556,7 +556,7 @@ def test():
 
     # print(kauffman(figure8))
 
-    # print(k1, k2, k3, unknot, right_trefoil)
+    print(k1, k2, k3, unknot, right_trefoil)
 
 
 if __name__ == "__main__":
