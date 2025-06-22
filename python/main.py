@@ -412,6 +412,10 @@ class KauffmanPol:
     def __rmul__(self: "KauffmanPol", coeff: int):
         return KauffmanPol({key: coeff * val for key, val in self.pol.items()})
     
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, KauffmanPol): return False
+        return self.pol == value.pol
+
     def pow(self, exp: int):
         res = KauffmanPol({0: 1})
         for _ in range(exp):
@@ -506,11 +510,18 @@ def test():
         [0, 0, 5, 1, 6]
     ])
 
-    left_trefoil = Knot([
+    right_trefoil = Knot([
         [0, 3, 4, 0],
         [3, 7, 8, 4],
         [2, 5, 7, 6],
         [5, 1, 6, 0]
+    ])
+
+    left_trefoil = Knot([
+        [0, 3, 4, 0],
+        [3, 8, 7, 4],
+        [5, 7, 6, 2],
+        [0, 5, 1, 6]   
     ])
 
     unknot = Knot([
@@ -520,14 +531,32 @@ def test():
 
     k3 = Knot([[3,1,1,4,0],[2,0,3,8,4],[2,3,8,6,2],[5,8,6,0,2],[0,5,1,1,6]])
     
-    print(kauffman(left_trefoil))
+    pr = kauffman(right_trefoil)
+    print(right_trefoil)
+    print("Noeud de trèfle à droite: <K1> = ", pr)
+
+    pl = kauffman(left_trefoil)
     print(left_trefoil)
+    print(f"Noeud de trèfle à gauche: <K2> = {pl}")
 
-    figure8 = Knot([[0,0,3,4,0],[3,1,8,7,4],[2,3,7,6,2],[5,7,6,0,2],[0,5,1,1,6]])
+    left_and_right_trefoil = Knot([[0,3,4,0,0,0,3,4,0],[3,8,7,1,1,1,7,8,4],[5,7,6,0,0,0,5,7,6],[0,5,1,1,1,1,1,6,0]])
 
-    print(kauffman(figure8))
+    prl = kauffman(left_and_right_trefoil)
+    print(left_and_right_trefoil)
+    print("<K1#K2> = ", prl)
 
-    print(k1, k2, k3, unknot, left_trefoil)
+    print("")
+    print(f"<K1><K2> = ({pl})*({pr})")
+    print(f"         = {pl*pr}")
+    print( "<K1><K2> = <K1#K2>")
+    print(pr*pl == prl)
+
+
+    # figure8 = Knot([[0,0,3,4,0],[3,1,8,7,4],[2,3,7,6,2],[5,7,6,0,2],[0,5,1,1,6]])
+
+    # print(kauffman(figure8))
+
+    # print(k1, k2, k3, unknot, right_trefoil)
 
 
 if __name__ == "__main__":
