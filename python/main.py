@@ -1,3 +1,5 @@
+from typing import Any
+
 from enum import Enum
 import json
 from copy import deepcopy
@@ -6,6 +8,13 @@ import sys
 sysargs = sys.argv
 
 verbose_mode = False
+
+def index_of(l: list[Any], el: Any):
+    try:
+        return l.index(el)
+    except ValueError:
+        return -1
+    
 
 # symbol string representations to be used for printing
 symbol_str_representations = [
@@ -566,7 +575,7 @@ if __name__ == "__main__":
     if sysargs.count("-t") > 0: # run tests
         test()
 
-    elif (i := sysargs.index("-k")) != -1: # run kauffman on specified knot
+    elif (i := index_of(sysargs, '-k')) != -1: # run kauffman on specified knot
         try:
             k = Knot(json.loads(sysargs[i+1]))
             print(kauffman(k))
@@ -575,7 +584,7 @@ if __name__ == "__main__":
         except:
             print("Error: invalid knot")
 
-    elif (i := sysargs.index("-d")) != -1: # draw specified knot
+    elif (i := index_of(sysargs, '-d')) != -1: # draw specified knot
         try:
             k = Knot(json.loads(sysargs[i+1]))
             print(k)
